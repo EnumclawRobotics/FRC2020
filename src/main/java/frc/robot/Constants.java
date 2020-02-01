@@ -16,4 +16,44 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+    public final static int FrontLeftMotorCanId = 9;
+    public final static int BackLeftMotorCanId = 8;
+    public final static int FrontRightMotorCanId = 7;
+    public final static int BackRightMotorCanId = 6;
+
+    public final static int HopperMotorCanId = 14;
+    public final static double HopperIntakingPower = .3;
+    public final static double HopperExpellingPower = -.3;
+    public final static double HopperShootingPower = -.3;
+
+    public final static int IntakeMotorCanId = 15;
+    public final static double IntakeIntakingPower = .3;
+    public final static double IntakeExpellingPower = -.3;
+    public final static double IntakeShootingPower = .3;
+
+    public final static int ShooterMotorCanId = 16;
+
+    // PID coefficients
+    public final static double ShooterkP = 5e-5; 
+    public final static double ShooterkI = 1e-6;
+    public final static double ShooterkD = 0; 
+    public final static double ShooterkIz = 0; 
+    public final static double ShooterkFF = 0; 
+    public final static double ShooterkMaxOutput = 1; 
+    public final static double ShooterkMinOutput = -1;
+    public final static double ShootermaxRPM = 5700;
+
+    public final static int PanelMotorCanId = 16;
+    public final static double MaxPanelMotorPower = 0.60;
+
+    public final static int ArmMotorCanId = 17;
+
+    public final static int WinchMotorCanId = 18;
+    public final static double winchSpeed = 0.5;
+
+    public final static int HookTraverseMotorCanId = 19;
+    public final static int HookLockServoChannel = 5;
+    public final static double HookLockPosition = 0.5;
+    public final static double HookUnlockPosition = 0.0;
+
 }

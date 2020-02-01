@@ -8,17 +8,27 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
-public class ExampleSubsystem extends SubsystemBase {
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
+public class ControlPanelSubsystem extends SubsystemBase {
+  private CANSparkMax panelMotor = new CANSparkMax(Constants.PanelMotorCanId, MotorType.kBrushless);
   /**
    * Creates a new ExampleSubsystem.
    */
-  public ExampleSubsystem() {
+  public ControlPanelSubsystem() {
 
   }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  public void spinPanel(double power)
+  {
+    panelMotor.set(power * Constants.MaxPanelMotorPower);
+  }
+
+  public void stopped()
+  {
+    panelMotor.stopMotor();
   }
 }
