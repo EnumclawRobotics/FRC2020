@@ -10,7 +10,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.commands.ShootingTimedCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeHopperShooterSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
@@ -22,9 +25,11 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  */
 public class Robot extends TimedRobot {
   private DriveSubsystem driveSubsystem;
+  private IntakeHopperShooterSubsystem intakeHopperShooterSubsystem;
   private XboxController xboxController;
 
-  private Command m_autonomousCommand;
+  //private Command m_autonomousCommand;
+  private Command autonomousCommand;
 
   //private RobotContainer m_robotContainer;
 
@@ -40,6 +45,7 @@ public class Robot extends TimedRobot {
   
     xboxController = new XboxController(0);
     driveSubsystem = new DriveSubsystem();
+    intakeHopperShooterSubsystem = new IntakeHopperShooterSubsystem();
   }
 
   /**
@@ -80,6 +86,12 @@ public class Robot extends TimedRobot {
     // if (m_autonomousCommand != null) {
     //   m_autonomousCommand.schedule();
     // }
+
+    autonomousCommand = new SequentialCommandGroup(new ShootingTimedCommand(5, 1000, intakeHopperShooterSubsystem));
+    if (autonomousCommand != null)
+    {
+      autonomousCommand.schedule();
+    }
   }
 
   /**
@@ -87,6 +99,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousPeriodic() {
+
   }
 
   @Override
@@ -95,8 +108,12 @@ public class Robot extends TimedRobot {
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
     // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+    // if (m_autonomousCommand != null) {
+    //   m_autonomousCommand.cancel();
+    // }
+    if (autonomousCommand != null)
+    {
+      autonomousCommand.cancel();
     }
   }
 

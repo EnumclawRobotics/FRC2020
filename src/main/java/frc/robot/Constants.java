@@ -6,6 +6,7 @@
 /*----------------------------------------------------------------------------*/
 
 package frc.robot;
+import edu.wpi.first.wpilibj.I2C;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -45,8 +46,10 @@ public final class Constants {
 
     public final static int PanelMotorCanId = 16;
     public final static double MaxPanelMotorPower = 0.60;
+    public final static I2C.Port ColorSensorPort = I2C.Port.kOnboard;
 
     public final static int ArmMotorCanId = 17;
+    public final static double armMotorSpeed = 0.50;
 
     public final static int WinchMotorCanId = 18;
     public final static double winchSpeed = 0.5;

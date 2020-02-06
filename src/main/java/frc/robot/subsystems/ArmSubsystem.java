@@ -7,7 +7,6 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -25,10 +24,14 @@ public class ArmSubsystem extends SubsystemBase {
     armMotorEncoder = armMotor.getEncoder();
   }
 
-  public void openArm()
+  public double getDegreesRotated()
   {
-    //Needs to rotate X degrees to open arm, there isn't a setPosition command, so either maintain power until an encoder value
-    //is reached or use Position Closed Loop Control
+    return armMotorEncoder.getPosition() * 360; //TODO Does .getPosition() count revolutions or "'rotations'"?
+  }
+
+  public void moveArm(double speed)
+  {
+    armMotor.set(speed);
   }
 
   public void stopped()

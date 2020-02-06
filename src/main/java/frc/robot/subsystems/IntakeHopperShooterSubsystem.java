@@ -16,6 +16,9 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.ControlType;
 
+//To see how to do closed loop velocity control, see link below
+//https://github.com/REVrobotics/SPARK-MAX-Examples/blob/master/Java/Velocity%20Closed%20Loop%20Control/src/main/java/frc/robot/Robot.java
+
 public class IntakeHopperShooterSubsystem extends SubsystemBase {
     private CANSparkMax intakeMotor = new CANSparkMax(Constants.IntakeMotorCanId, MotorType.kBrushless);
     private CANSparkMax hopperMotor = new CANSparkMax(Constants.HopperMotorCanId, MotorType.kBrushless);
@@ -50,6 +53,9 @@ public class IntakeHopperShooterSubsystem extends SubsystemBase {
         shoot(0);
     }
 
+    /**
+     * @param targetVelocity (RPM)
+     */
     public void shooting(double targetVelocity)
     {
         shoot(targetVelocity);
