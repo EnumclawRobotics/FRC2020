@@ -28,34 +28,36 @@ public class ControlPanelSubsystem extends SubsystemBase {
    * Note: Any example colors should be calibrated as the user needs, these
    * are here as a basic example.
    */
-  private final Color kBlueTarget = ColorMatch.makeColor(0.143, 0.427, 0.429);
-  private final Color kGreenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
-  private final Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
-  private final Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
 
   /**
    * Creates a new ExampleSubsystem.
    */
   public ControlPanelSubsystem() {
-    m_colorMatcher.addColorMatch(kBlueTarget);
-    m_colorMatcher.addColorMatch(kGreenTarget);
-    m_colorMatcher.addColorMatch(kRedTarget);
-    m_colorMatcher.addColorMatch(kYellowTarget);
+    m_colorMatcher.addColorMatch(Constants.kBlueTarget);
+    m_colorMatcher.addColorMatch(Constants.kGreenTarget);
+    m_colorMatcher.addColorMatch(Constants.kRedTarget);
+    m_colorMatcher.addColorMatch(Constants.kYellowTarget);
   }
+
+  public Color getColor()
+  {
+    return colorSensor.getColor();
+  }
+
 
   public String getColorMatch()
   {
-    Color detectedColor = colorSensor.getColor();
+    Color color = getColor();
     String colorString;
-    ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
+    ColorMatchResult match = m_colorMatcher.matchClosestColor(color);
 
-    if (match.color == kBlueTarget) {
+    if (match.color == Constants.kBlueTarget) {
       colorString = "Blue";
-    } else if (match.color == kRedTarget) {
+    } else if (match.color == Constants.kRedTarget) {
       colorString = "Red";
-    } else if (match.color == kGreenTarget) {
+    } else if (match.color == Constants.kGreenTarget) {
       colorString = "Green";
-    } else if (match.color == kYellowTarget) {
+    } else if (match.color == Constants.kYellowTarget) {
       colorString = "Yellow";
     } else {
       colorString = "Unknown";

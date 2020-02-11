@@ -19,17 +19,17 @@ public class ShootingTimedCommand extends CommandBase {
   private final IntakeHopperShooterSubsystem subsystem;
   private final Timer timer = new Timer();
   private double duration;
-  private double rpm;
+  private double shooterRMP;
 
   /**
    * Creates a new Command.
    *
    * @param subsystem The subsystem used by this command.
    */
- public ShootingTimedCommand(double duration, double rpm, IntakeHopperShooterSubsystem subsystem) {
+ public ShootingTimedCommand(double duration, double shooterRPM, IntakeHopperShooterSubsystem subsystem) {
    this.subsystem = subsystem;
    this.duration = duration;
-   this.rpm = rpm;
+   this.shooterRMP = shooterRPM;
    addRequirements(subsystem);
  }
 
@@ -37,12 +37,13 @@ public class ShootingTimedCommand extends CommandBase {
   @Override
   public void initialize() {
       timer.reset();
+      timer.start();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    subsystem.shooting(rpm);
+    subsystem.shoot(shooterRMP);
   }
 
   // Called once the command ends or is interrupted.

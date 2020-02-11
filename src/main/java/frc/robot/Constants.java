@@ -7,6 +7,8 @@
 
 package frc.robot;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.util.Color;
+import com.revrobotics.ColorMatch;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -32,7 +34,8 @@ public final class Constants {
     public final static double IntakeExpellingPower = -.3;
     public final static double IntakeShootingPower = .3;
 
-    public final static int ShooterMotorCanId = 16;
+    public final static int ShooterMotor1CanId = 16;
+    public final static int ShooterMotor2CanId = 17;
 
     // PID coefficients
     public final static double ShooterkP = 5e-5; 
@@ -47,6 +50,11 @@ public final class Constants {
     public final static int PanelMotorCanId = 16;
     public final static double MaxPanelMotorPower = 0.60;
     public final static I2C.Port ColorSensorPort = I2C.Port.kOnboard;
+
+    public final static Color kBlueTarget = ColorMatch.makeColor(0.143, 0.427, 0.429);
+    public final static Color kGreenTarget = ColorMatch.makeColor(0.197, 0.561, 0.240);
+    public final static Color kRedTarget = ColorMatch.makeColor(0.561, 0.232, 0.114);
+    public final static Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
 
     public final static int ArmMotorCanId = 17;
     public final static double armMotorSpeed = 0.50;
