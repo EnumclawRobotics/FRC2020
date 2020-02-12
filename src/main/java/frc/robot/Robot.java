@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.ShootingTimedCommand;
+import frc.robot.commands.OldShootingTimedCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeHopperShooterSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
@@ -87,7 +87,7 @@ public class Robot extends TimedRobot {
     //   m_autonomousCommand.schedule();
     // }
 
-    autonomousCommand = new SequentialCommandGroup(new ShootingTimedCommand(5, 1000, intakeHopperShooterSubsystem));
+    autonomousCommand = new SequentialCommandGroup(new OldShootingTimedCommand(5, 1000, intakeHopperShooterSubsystem));
     if (autonomousCommand != null)
     {
       autonomousCommand.schedule();

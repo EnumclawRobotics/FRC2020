@@ -25,7 +25,7 @@ public class IntakeHopperShooterSubsystem extends PIDSubsystem {
     private CANSparkMax shooterMotor1;
     private CANSparkMax shooterMotor2;
     private PIDController shooterPIDController;
-    private final CANEncoder shooterEncoder;
+    private CANEncoder shooterEncoder;
     private int shooterTargetRPM;
 
     public IntakeHopperShooterSubsystem()

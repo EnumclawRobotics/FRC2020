@@ -1,60 +1,59 @@
-/*----------------------------------------------------------------------------*/
-/* Copyright (c) 2018-2019 FIRST. All Rights Reserved.                        */
-/* Open Source Software - may be modified and shared by FRC teams. The code   */
-/* must be accompanied by the FIRST BSD license file in the root directory of */
-/* the project.                                                               */
-/*----------------------------------------------------------------------------*/
-
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.IntakeHopperShooterSubsystem;
+import frc.robot.subsystems.IntakeHopperSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj.Timer;
 
-/**
- * An example command that uses a subsystem.
- */
 public class ShootingTimedCommand extends CommandBase {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final IntakeHopperShooterSubsystem subsystem;
-  private final Timer timer = new Timer();
-  private double duration;
-  private double shooterRMP;
+    private IntakeHopperSubsystem intakeHopperSubsystem;
+    private ShooterSubsystem shooterSubsystem;
+    private final Timer timer = new Timer();
+    private double duration;
+    private double shooterRPM;
 
-  /**
-   * Creates a new Command.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
- public ShootingTimedCommand(double duration, double shooterRPM, IntakeHopperShooterSubsystem subsystem) {
-   this.subsystem = subsystem;
-   this.duration = duration;
-   this.shooterRMP = shooterRPM;
-   addRequirements(subsystem);
- }
+    public ShootingTimedCommand(double duration, double shooterRPM, IntakeHopperSubsystem intakeHopperSubsystem, ShooterSubsystem shooterSubsystem) {
+        this.intakeHopperSubsystem = intakeHopperSubsystem;
+        this.shooterSubsystem = shooterSubsystem;
+        this.duration = duration;
+        this.shooterRPM = shooterRPM;
+        addRequirements(intakeHopperSubsystem, shooterSubsystem);
+    }
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-      timer.reset();
-      timer.start();
-  }
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        shooterSubsystem.setSetpoint(shooterRPM);
+        timer.reset();
+        timer.start();
+    }
 
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    subsystem.shoot(shooterRMP);
-  }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        //TODO Learn how the useOutput command of a PIDSubsystem is used
+        shooterSubsystem.useOutput(0, shooterRPM);
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-      subsystem.stopped();
-  }
+        if(shooterSubsystem.atSetpoint())
+        {
+            intakeHopperSubsystem.transportToShooter();
+        }
+        else
+        {
+            intakeHopperSubsystem.stopped();
+        }
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return (timer.get() >= duration);
-  }
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {
+        intakeHopperSubsystem.stopped();
+        shooterSubsystem.stopped();
+    }
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        return (timer.get() >= duration);
+    }
 }
