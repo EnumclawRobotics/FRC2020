@@ -21,6 +21,30 @@ import frc.robot.subsystems.WinchSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
+/* TODO Overall Todo List
+    - Control Panel (Low Priority)
+      - Add Flipout motor
+      - Rotation Control Function
+      - Get color for Position Control
+      - Position Control Function
+
+    - Autonomous (Med/High Priority)
+      - Drive encoders
+      - Get Gyro Data
+      - Driving functions
+
+    - Physical Related (High Priority)
+      - ID the motors and update constants accordingly
+      - Specify other data such as RPM and Brushed/Brushless
+      - Switch needed Motors to be operated with VictorSPX?
+
+    - To keep note of, listen for team updates on
+      - Hook lock to stop sliding end of match
+      - Where control panel color sensor will be
+
+
+*/
+
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
  * each mode, as described in the TimedRobot documentation. If you change the name of this class or
@@ -39,6 +63,8 @@ public class Robot extends TimedRobot {
 
   //private Command m_autonomousCommand;
   private Command autonomousCommand;
+
+
 
   //private RobotContainer m_robotContainer;
 
@@ -174,7 +200,7 @@ public class Robot extends TimedRobot {
     }
 
     // Hook - rolling on bar (15 is dpad right, 14 is dpad left) (dpad Right - dpad Left) 
-    //TODO Check if this method of getting dpad input is correct or not. Controller should be a wired Xbox 360 controller
+    //TODO Check if this method of getting dpad input is correct or not. Controller should be a wired Xbox 360 controller. If using getPOV, which POV (int) is it?
     hookSubsystem.traversePower(Constants.HookTraversePower * ((xboxController.getRawButton(15) ? 1 : 0) - (xboxController.getRawButton(14) ? 1 : 0)));
 
     // Intake/Hopper/Shooter

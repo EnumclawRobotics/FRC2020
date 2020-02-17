@@ -23,6 +23,7 @@ public final class Constants {
     public final static int BackLeftMotorCanId = 8;
     public final static int FrontRightMotorCanId = 7;
     public final static int BackRightMotorCanId = 6;
+    public final static boolean GyroReversed = false;
 
     public final static int HopperMotorCanId = 14;
     public final static double HopperIntakingPower = .3;
