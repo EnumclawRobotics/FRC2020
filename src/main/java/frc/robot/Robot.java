@@ -11,9 +11,13 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.OldShootingTimedCommand;
+import frc.robot.commands.ShootingTimedCommand;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.IntakeHopperShooterSubsystem;
+import frc.robot.subsystems.HookSubsystem;
+import frc.robot.subsystems.IntakeHopperSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.subsystems.WinchSubsystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 
@@ -25,7 +29,12 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
  */
 public class Robot extends TimedRobot {
   private DriveSubsystem driveSubsystem;
-  private IntakeHopperShooterSubsystem intakeHopperShooterSubsystem;
+  //private IntakeHopperShooterSubsystem intakeHopperShooterSubsystem;
+  private IntakeHopperSubsystem intakeHopperSubsystem;
+  private ShooterSubsystem shooterSubsystem;
+  private ArmSubsystem armSubsystem;
+  private WinchSubsystem winchSubsystem;
+  private HookSubsystem hookSubsystem;
   private XboxController xboxController;
 
   //private Command m_autonomousCommand;
@@ -45,7 +54,11 @@ public class Robot extends TimedRobot {
   
     xboxController = new XboxController(0);
     driveSubsystem = new DriveSubsystem();
-    intakeHopperShooterSubsystem = new IntakeHopperShooterSubsystem();
+    intakeHopperSubsystem = new IntakeHopperSubsystem();
+    shooterSubsystem = new ShooterSubsystem();
+    armSubsystem = new ArmSubsystem();
+    winchSubsystem = new WinchSubsystem();
+    hookSubsystem = new HookSubsystem();
   }
 
   /**
@@ -87,7 +100,7 @@ public class Robot extends TimedRobot {
     //   m_autonomousCommand.schedule();
     // }
 
-    autonomousCommand = new SequentialCommandGroup(new OldShootingTimedCommand(5, 1000, intakeHopperShooterSubsystem));
+    autonomousCommand = new SequentialCommandGroup(new ShootingTimedCommand(5, 1000, intakeHopperSubsystem, shooterSubsystem));
     if (autonomousCommand != null)
     {
       autonomousCommand.schedule();
@@ -122,7 +135,86 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+
+    //Driving, Left Trigger reverses forward/backward
+    if (xboxController.getTriggerAxis(Hand.kLeft) > 0.50)
+    {
+      driveSubsystem.arcadeDrive(-xboxController.getY(Hand.kLeft), -xboxController.getX(Hand.kRight));  
+    }
+    else
+    {
       driveSubsystem.arcadeDrive(xboxController.getY(Hand.kLeft), xboxController.getX(Hand.kRight));
+    }
+
+    //Arm (X Retract, Y Extend)
+    if (xboxController.getXButton())
+    {
+      //Retract Target
+      armSubsystem.setSetpoint(0);
+    }
+    else if (xboxController.getYButton())
+    {
+      //Extend Target
+      armSubsystem.setSetpoint(90);
+    }
+    else
+    {
+      armSubsystem.stop();
+    }
+
+
+    // Winch (B-A)
+    if (xboxController.getYButton())
+    {
+      winchSubsystem.setPower(Constants.winchSpeed * ((xboxController.getBButton() ? 1 : 0) - (xboxController.getAButton() ? 1 : 0)));
+    }
+    else
+    {
+      winchSubsystem.stop();
+    }
+
+    // Hook - rolling on bar (15 is dpad right, 14 is dpad left) (dpad Right - dpad Left) 
+    //TODO Check if this method of getting dpad input is correct or not. Controller should be a wired Xbox 360 controller
+    hookSubsystem.traversePower(Constants.HookTraversePower * ((xboxController.getRawButton(15) ? 1 : 0) - (xboxController.getRawButton(14) ? 1 : 0)));
+
+    // Intake/Hopper/Shooter
+    if (xboxController.getTriggerAxis(Hand.kLeft) > 0.25) {
+        intakeHopperSubsystem.transportToShooter();
+        shooterSubsystem.setSetpoint(Constants.ShooterFreeThrowRPM); //5000 RPMs
+    }
+    else {
+      shooterSubsystem.stop();
+
+      if (xboxController.getBumper(Hand.kRight)) {
+        intakeHopperSubsystem.intake();
+      }
+      else if (xboxController.getTriggerAxis(Hand.kRight) > 0.25) {
+        intakeHopperSubsystem.expel();
+      }
+      else {
+        intakeHopperSubsystem.stop();
+      }
+    }
+
+    // panel flipout and rotator
+    // [Put code here]
+
+    /*Additional List *Done (May exclude speed variables)
+    -* Switch Front/Back - left bumper > 50%
+    -* Intake (Reversable) - right bumper / right trigger 
+    -* Shooting - left trigger > 25%
+    -* Raise Arm (Reversable) - X & Y
+    -* Winching (Reversable) - A & B
+    -* Hook Travel (Reversable) - (hat) dpad left and right
+    - control panel flipout - select
+    - control panel rotate - start 
+
+
+    */
+
+
+
+
   }
 
   @Override

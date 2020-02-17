@@ -30,7 +30,7 @@ public class IntakeHopperSubsystem extends SubsystemBase {
         hopperMotor.set(Constants.HopperShootingPower);
     }
 
-    public void stopped() {
+    public void stop() {
         intakeMotor.stopMotor();
         hopperMotor.stopMotor();
     }

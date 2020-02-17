@@ -46,6 +46,11 @@ public final class Constants {
     public final static double ShooterkMaxOutput = 1; 
     public final static double ShooterkMinOutput = -1;
     public final static double ShootermaxRPM = 5700;
+    public final static double ShooterkSVolts = 000;
+    public final static double ShooterkWoltSecondsPerRotation = 000;
+    public final static double ShooterTolerance = 000;
+    public final static int ShooterEncoderCountsPerRevolution = 8192;
+    public final static double ShooterFreeThrowRPM = 5000;
 
     public final static int PanelMotorCanId = 16;
     public final static double MaxPanelMotorPower = 0.60;
@@ -66,5 +71,6 @@ public final class Constants {
     public final static int HookLockServoChannel = 5;
     public final static double HookLockPosition = 0.5;
     public final static double HookUnlockPosition = 0.0;
+    public final static double HookTraversePower = 1.0;
 
 }

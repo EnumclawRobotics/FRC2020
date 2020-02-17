@@ -31,8 +31,6 @@ public class ShootingTimedCommand extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        //TODO Learn how the useOutput command of a PIDSubsystem is used
-        shooterSubsystem.useOutput(0, shooterRPM);
 
         if(shooterSubsystem.atSetpoint())
         {
@@ -40,15 +38,16 @@ public class ShootingTimedCommand extends CommandBase {
         }
         else
         {
-            intakeHopperSubsystem.stopped();
+            intakeHopperSubsystem.stop();
         }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        intakeHopperSubsystem.stopped();
-        shooterSubsystem.stopped();
+        shooterSubsystem.setSetpoint(0);
+        intakeHopperSubsystem.stop();
+        shooterSubsystem.stop();
     }
 
     // Returns true when the command should end.

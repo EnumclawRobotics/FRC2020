@@ -24,15 +24,15 @@ public class WinchSubsystem extends SubsystemBase {
 
   public void startWinching()
   {
-    winchPower(Constants.winchSpeed);
+    setPower(Constants.winchSpeed);
   }
 
-  public void winchPower(double power)
+  public void setPower(double power)
   {
     winchMotor.set(power);
   }
 
-  public void stopped()
+  public void stop()
   {
     winchMotor.stopMotor();
   }
