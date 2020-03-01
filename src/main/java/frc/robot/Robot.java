@@ -34,9 +34,9 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
       - Driving functions
 
     - Physical Related (High Priority)
-      - ID the motors and update constants accordingly
-      - Specify other data such as RPM and Brushed/Brushless
-      - Switch needed Motors to be operated with VictorSPX?
+      - ID the motors and update constants accordingly (Did SparkMax Motors)
+      - Specify other data such as RPM and Brushed/Brushless (Did SparkMax Motors)
+      - Switch needed Motors to be operated with VictorSPX (Done until more need replacement)
 
     - To keep note of, listen for team updates on
       - Hook lock to stop sliding end of match
@@ -206,7 +206,7 @@ public class Robot extends TimedRobot {
     // Intake/Hopper/Shooter
     if (xboxController.getTriggerAxis(Hand.kLeft) > 0.25) {
         intakeHopperSubsystem.transportToShooter();
-        shooterSubsystem.setSetpoint(Constants.ShooterFreeThrowRPM); //5000 RPMs
+        shooterSubsystem.setSetpoint(Constants.ShooterFreeThrowRPS); //5000/60 
     }
     else {
       shooterSubsystem.stop();

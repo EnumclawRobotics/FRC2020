@@ -10,15 +10,18 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+//import com.revrobotics.CANSparkMax;
+//import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Servo;
 
 public class HookSubsystem extends SubsystemBase {
   //Plan to actually use: Johnson Electric Gearmotor and Output Shaft am-4230, which is a PWM based motor,
   //may need to be specially configured for its deadzones and such to get it working.
-  private CANSparkMax hookTraverseMotor = new CANSparkMax(Constants.HookTraverseMotorCanId, MotorType.kBrushed);
+  //private CANSparkMax hookTraverseMotor = new CANSparkMax(Constants.HookTraverseMotorCanId, MotorType.kBrushed);
+  private VictorSPX hookTraverseMotor = new VictorSPX(Constants.HookTraverseMotorCanId);
   private Servo hooklockServo = new Servo(Constants.HookLockServoChannel);
 
   /**
@@ -30,7 +33,8 @@ public class HookSubsystem extends SubsystemBase {
 
   public void traversePower(double power)
   {
-    hookTraverseMotor.set(power);
+    //hookTraverseMotor.set(power);
+    hookTraverseMotor.set(ControlMode.PercentOutput, power);
   }
 
   public void lockHook()
@@ -46,7 +50,8 @@ public class HookSubsystem extends SubsystemBase {
   public void stopped()
   {
     hooklockServo.stopMotor();
-    hookTraverseMotor.stopMotor();
+    //hookTraverseMotor.stopMotor();
+    hookTraverseMotor.set(ControlMode.PercentOutput, 0);
   }
 
 
