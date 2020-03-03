@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.ShootingTimedCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.HookSubsystem;
+//import frc.robot.subsystems.HookSubsystem;
 import frc.robot.subsystems.IntakeHopperSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.WinchSubsystem;
@@ -58,8 +58,10 @@ public class Robot extends TimedRobot {
   private ShooterSubsystem shooterSubsystem;
   private ArmSubsystem armSubsystem;
   private WinchSubsystem winchSubsystem;
-  private HookSubsystem hookSubsystem;
-  private XboxController xboxController;
+//  private HookSubsystem hookSubsystem;
+  private XboxController xboxController1;
+  private XboxController xboxController2;
+  
 
   //private Command m_autonomousCommand;
   private Command autonomousCommand;
@@ -78,13 +80,14 @@ public class Robot extends TimedRobot {
     // autonomous chooser on the dashboard.
 //    m_robotContainer = new RobotContainer();
   
-    xboxController = new XboxController(0);
+    xboxController1 = new XboxController(0);
+    xboxController2 = new XboxController(1);
     driveSubsystem = new DriveSubsystem();
     intakeHopperSubsystem = new IntakeHopperSubsystem();
     shooterSubsystem = new ShooterSubsystem();
     armSubsystem = new ArmSubsystem();
     winchSubsystem = new WinchSubsystem();
-    hookSubsystem = new HookSubsystem();
+    //hookSubsystem = new HookSubsystem();
   }
 
   /**
@@ -101,6 +104,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
   }
 
   /**
@@ -108,6 +112,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
+      this.shooterSubsystem.disable();
   }
 
   @Override
@@ -163,63 +168,45 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
 
     //Driving, Left Trigger reverses forward/backward
-    if (xboxController.getTriggerAxis(Hand.kLeft) > 0.50)
+    if (xboxController1.getTriggerAxis(Hand.kLeft) > 0.50)
     {
-      driveSubsystem.arcadeDrive(-xboxController.getY(Hand.kLeft), -xboxController.getX(Hand.kRight));  
+      driveSubsystem.arcadeDrive(-xboxController1.getY(Hand.kLeft), xboxController1.getX(Hand.kRight));  
     }
     else
     {
-      driveSubsystem.arcadeDrive(xboxController.getY(Hand.kLeft), xboxController.getX(Hand.kRight));
+      driveSubsystem.arcadeDrive(xboxController1.getY(Hand.kLeft), -xboxController1.getX(Hand.kRight));
     }
 
-    //Arm (X Retract, Y Extend)
-    if (xboxController.getXButton())
-    {
-      //Retract Target
-      armSubsystem.setSetpoint(0);
-    }
-    else if (xboxController.getYButton())
-    {
-      //Extend Target
-      armSubsystem.setSetpoint(90);
-    }
-    else
-    {
-      armSubsystem.stop();
-    }
+        // Winch (2nd controller - left joy y)
+    winchSubsystem.setPower(xboxController2.getY(Hand.kLeft));
 
-
-    // Winch (B-A)
-    if (xboxController.getYButton())
-    {
-      winchSubsystem.setPower(Constants.winchSpeed * ((xboxController.getBButton() ? 1 : 0) - (xboxController.getAButton() ? 1 : 0)));
-    }
-    else
-    {
-      winchSubsystem.stop();
-    }
+    //Arm (2nd controller - right joy y )
+    armSubsystem.setPower(xboxController2.getY(Hand.kRight));
+ 
 
     // Hook - rolling on bar (15 is dpad right, 14 is dpad left) (dpad Right - dpad Left) 
     //TODO Check if this method of getting dpad input is correct or not. Controller should be a wired Xbox 360 controller. If using getPOV, which POV (int) is it?
-    hookSubsystem.traversePower(Constants.HookTraversePower * ((xboxController.getRawButton(15) ? 1 : 0) - (xboxController.getRawButton(14) ? 1 : 0)));
+//    hookSubsystem.traversePower(Constants.HookTraversePower * ((xboxController.getRawButton(15) ? 1 : 0) - (xboxController.getRawButton(14) ? 1 : 0)));
 
     // Intake/Hopper/Shooter
-    if (xboxController.getTriggerAxis(Hand.kLeft) > 0.25) {
+    if (xboxController1.getTriggerAxis(Hand.kLeft) > 0.25) {
         intakeHopperSubsystem.transportToShooter();
-        shooterSubsystem.setSetpoint(Constants.ShooterFreeThrowRPS); //5000/60 
+        shooterSubsystem.enable();
     }
     else {
+      shooterSubsystem.disable();
       shooterSubsystem.stop();
 
-      if (xboxController.getBumper(Hand.kRight)) {
+      if (xboxController1.getBumper(Hand.kRight)) {
         intakeHopperSubsystem.intake();
       }
-      else if (xboxController.getTriggerAxis(Hand.kRight) > 0.25) {
+      else if (xboxController1.getTriggerAxis(Hand.kRight) > 0.25) {
         intakeHopperSubsystem.expel();
       }
       else {
         intakeHopperSubsystem.stop();
       }
+
     }
 
     // panel flipout and rotator

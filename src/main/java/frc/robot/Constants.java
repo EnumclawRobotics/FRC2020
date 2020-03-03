@@ -27,9 +27,9 @@ public final class Constants {
 //    public final static boolean GyroReversed = false;
 
     public final static int IntakeMotorCanId = 10;      //VictorSPX - redline
-    public final static double IntakeIntakingPower = .3;
-    public final static double IntakeExpellingPower = -.3;
-    public final static double IntakeShootingPower = .3;
+    public final static double IntakeIntakingPower = .6;
+    public final static double IntakeExpellingPower = -.6;
+    public final static double IntakeShootingPower = .6;
 
     public final static int HopperMotorCanId = 11;        //VictorSPX - redline
     public final static double HopperIntakingPower = .3;
@@ -42,8 +42,8 @@ public final class Constants {
     public final static int ShooterEncoderBDIO = 2;     // Yellow cable
 
     // PID coefficients
-    public final static double ShooterkP = 5e-5; 
-    public final static double ShooterkI = 1e-6;
+    public final static double ShooterkP = 1e-2; 
+    public final static double ShooterkI = .5e-3;
     public final static double ShooterkD = 0; 
     public final static double ShooterkIz = 0; 
     public final static double ShooterkFF = 0; 
@@ -67,7 +67,8 @@ public final class Constants {
     public final static Color kYellowTarget = ColorMatch.makeColor(0.361, 0.524, 0.113);
 
     public final static int ArmMotorCanId = 16; //(done) todo Physically move Spark Max of Flipout to arm motor, Spark Max there is broken
-    public final static double armMotorSpeed = 0.50;
+    public final static double ArmReachPowerSpan = 0.20;
+    public final static double ArmRetractPowerSpan = 0.05;
 
     public final static int HookTraverseMotorCanId = 17; //Victor SPX
     public final static int HookLockServoChannel = 5;

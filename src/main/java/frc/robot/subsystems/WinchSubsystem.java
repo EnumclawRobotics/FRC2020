@@ -14,17 +14,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class WinchSubsystem extends SubsystemBase {
-  private CANSparkMax winchMotor = new CANSparkMax(Constants.WinchMotorCanId, MotorType.kBrushless);
-  /**
-   * Creates a new ExampleSubsystem.
-   */
+  private CANSparkMax winchMotor;
+
   public WinchSubsystem() {
-
-  }
-
-  public void startWinching()
-  {
-    setPower(Constants.winchSpeed);
+    winchMotor = new CANSparkMax(Constants.WinchMotorCanId, MotorType.kBrushless);
   }
 
   public void setPower(double power)

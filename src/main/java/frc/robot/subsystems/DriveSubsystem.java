@@ -22,9 +22,6 @@ public class DriveSubsystem extends SubsystemBase {
   // The robot's drive
   private final DifferentialDrive drive;
 
-  //private Encoder leftEncoder = new Encoder(000, 000, false); //TODO Ports for drive train encoders
-  //private Encoder rightEncoder = new Encoder(000, 000, true);
-
   //Gyro
   //private final Gyro gyro = new ADXRS450_Gyro();
 
@@ -52,11 +49,11 @@ public class DriveSubsystem extends SubsystemBase {
     drive.arcadeDrive(forward, rotation);
   }
 
-  public double getEncoderDistance()
-  {
-    //return leftEncoder.getDistance(); //TODO Factor in setDistancePerPulse(), Motor Encoder units per revolution, size of wheel
-    return 0;
-  }
+  // public double getEncoderDistance()
+  // {
+  //   //return leftEncoder.getDistance(); //TODO Factor in setDistancePerPulse(), Motor Encoder units per revolution, size of wheel
+  //   return 0;
+  // }
 
   // public void zeroHeading() {
   //   gyro.reset();
