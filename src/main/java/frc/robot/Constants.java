@@ -19,11 +19,13 @@ import com.revrobotics.ColorMatch;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    //Done
-    public final static int FrontLeftMotorCanId = 9;
-    public final static int BackLeftMotorCanId = 8;
-    public final static int FrontRightMotorCanId = 7;
-    public final static int BackRightMotorCanId = 6;
+    public final static double ArcadeDriveRotateFactor = .5;
+    public final static double ArcadeDriveForwardFactor = 1;
+
+    public final static int DriveFrontLeftMotorCanId = 9;
+    public final static int DriveBackLeftMotorCanId = 8;
+    public final static int DriveFrontRightMotorCanId = 7;
+    public final static int DriveBackRightMotorCanId = 6;
 //    public final static boolean GyroReversed = false;
 
     public final static int IntakeMotorCanId = 10;      //VictorSPX - redline
@@ -42,19 +44,26 @@ public final class Constants {
     public final static int ShooterEncoderBDIO = 2;     // Yellow cable
 
     // PID coefficients
-    public final static double ShooterkP = 1e-2; 
-    public final static double ShooterkI = .5e-3;
+//    public final static double ShooterkP = 1e-2; 
+//    public final static double ShooterkI = .5e-3;
+
+    public final static double ShooterkP = 5e-5; 
+    public final static double ShooterkI = 1e-6;
     public final static double ShooterkD = 0; 
     public final static double ShooterkIz = 0; 
-    public final static double ShooterkFF = 0; 
+    public final static double ShooterkFF = .75;            // % power
+    public final static double ShooterRamp = .025;          // only ramp 2.5% power per cycle 
     public final static double ShooterkMaxOutput = 1; 
     public final static double ShooterkMinOutput = -1;
-    public final static double ShootermaxRPS = 5700/60;
-    public final static double ShooterkSVolts = 000;
-    public final static double ShooterkWoltSecondsPerRotation = 000;
-    public final static double ShooterTolerance = 000;
+
     public final static int ShooterEncoderCountsPerRevolution = 8192;
     public final static double ShooterFreeThrowRPS = 5000/60;
+    public final static double ShooterToleranceRPS = 1;
+    public final static double ShootermaxRPS = 5700/60;
+
+    public final static double ShooterkSVolts = 000;
+    public final static double ShooterkWoltSecondsPerRotation = 000;
+    
 
     public final static int PanelMotorCanId = 14; //Rotator, 14 Neo Brushless Brake
     public final static int FlipOutMotorCanId = 15; //(done) todo Physically put a Victor SPX based motor controller here
@@ -68,7 +77,7 @@ public final class Constants {
 
     public final static int ArmMotorCanId = 16; //(done) todo Physically move Spark Max of Flipout to arm motor, Spark Max there is broken
     public final static double ArmReachPowerSpan = 0.20;
-    public final static double ArmRetractPowerSpan = 0.05;
+    public final static double ArmRetractPowerSpan = 0.00;
 
     public final static int HookTraverseMotorCanId = 17; //Victor SPX
     public final static int HookLockServoChannel = 5;
@@ -77,6 +86,5 @@ public final class Constants {
     public final static double HookTraversePower = 1.0;
 
     public final static int WinchMotorCanId = 18; //Done
-    public final static double winchSpeed = 0.5;
 
 }

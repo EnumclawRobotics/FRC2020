@@ -24,18 +24,17 @@ public class DriveSubsystem extends SubsystemBase {
 
   //Gyro
   //private final Gyro gyro = new ADXRS450_Gyro();
-
   //Webpage of interest for gyro https://wiki.analog.com/first/adxrs450_gyro_board_frc
 
   /**
    * Creates a new DriveSubsystem.
    */
   public DriveSubsystem() {
-    leftMotors = new SpeedControllerGroup(new CANSparkMax(Constants.FrontLeftMotorCanId, MotorType.kBrushed),
-                             new CANSparkMax(Constants.BackLeftMotorCanId, MotorType.kBrushed));
+    leftMotors = new SpeedControllerGroup(new CANSparkMax(Constants.DriveFrontLeftMotorCanId, MotorType.kBrushed),
+                             new CANSparkMax(Constants.DriveBackLeftMotorCanId, MotorType.kBrushed));
 
-    rightMotors = new SpeedControllerGroup(new CANSparkMax(Constants.FrontRightMotorCanId, MotorType.kBrushed),
-                                                      new CANSparkMax(Constants.BackRightMotorCanId, MotorType.kBrushed));
+    rightMotors = new SpeedControllerGroup(new CANSparkMax(Constants.DriveFrontRightMotorCanId, MotorType.kBrushed),
+                                                      new CANSparkMax(Constants.DriveBackRightMotorCanId, MotorType.kBrushed));
     drive = new DifferentialDrive(leftMotors, rightMotors);
   }
 
@@ -46,7 +45,9 @@ public class DriveSubsystem extends SubsystemBase {
    * @param rotation
    */
   public void arcadeDrive(double forward, double rotation) {
-    drive.arcadeDrive(forward, rotation);
+    // TODO: Add Ramping to drive? Or Feedforward to drive?
+
+    drive.arcadeDrive(forward * Constants.ArcadeDriveForwardFactor, rotation * Constants.ArcadeDriveRotateFactor);
   }
 
   // public double getEncoderDistance()

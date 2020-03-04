@@ -18,7 +18,7 @@ public class ArmSubsystem extends SubsystemBase {
   private double power;
 
   private enum ArmState {
-    Stopped, Reaching    // , Retracting
+    Stopped, Reaching, Retracting
   }
 
   private ArmState state = ArmState.Stopped;
@@ -28,6 +28,10 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public ArmSubsystem() {
     armMotor = new CANSparkMax(Constants.ArmMotorCanId, MotorType.kBrushless);
+    armMotor.setInverted(true);
+    armMotor.setOpenLoopRampRate(1);
+
+    
 //    armMotorEncoder = armMotor.getEncoder();
     // store degrees per click so that getPosition returns degrees
 //    armMotorEncoder.setPositionConversionFactor(360); // what gearbox?
@@ -60,9 +64,9 @@ public class ArmSubsystem extends SubsystemBase {
     if (power < 0) {
       state = ArmState.Reaching;
     }
-    // else if (power > 0) {
-    //   state = ArmState.Retracting;
-    // }
+    else if (power > 0) {
+      state = ArmState.Retracting;
+    }
     else {
       state = ArmState.Stopped;
     }
@@ -81,22 +85,25 @@ public class ArmSubsystem extends SubsystemBase {
     if (this.power != 0) {
       if (this.state == ArmState.Reaching) {
         armMotor.set(this.power * Constants.ArmReachPowerSpan);
-      // } else if (this.state == ArmState.Retracting) {
-      //   armMotor.set(this.power * Constants.ArmRetractPowerSpan);
+      } else if (this.state == ArmState.Retracting) {
+        armMotor.set(this.power * Constants.ArmRetractPowerSpan);
       }
     } else {
         armMotor.stopMotor();
     }
-    
-    // //This assumes positive power is reaching and positive encoder values is reaching
-    // if (state == ArmState.Reaching && setpoint > getRotation()) {
-    //   armMotor.set(1);
-    // }
-    // else if (state == ArmState.Retracting && setpoint < getRotation()) {
-    //   armMotor.set(-1);
-    // }
-    // else {
-    //   armMotor.stopMotor();
-    // }
   }
+
+  // @Override
+  // public void periodic() {
+  //   // //This assumes positive power is reaching and positive encoder values is reaching
+  //   // if (state == ArmState.Reaching && setpoint > getRotation()) {
+  //   //   armMotor.set(1);
+  //   // }
+  //   // else if (state == ArmState.Retracting && setpoint < getRotation()) {
+  //   //   armMotor.set(-1);
+  //   // }
+  //   // else {
+  //   //   armMotor.stopMotor();
+  //   // }
+  // }
 }

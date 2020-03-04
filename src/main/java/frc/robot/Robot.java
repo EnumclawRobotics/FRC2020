@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -62,11 +64,11 @@ public class Robot extends TimedRobot {
   private XboxController xboxController1;
   private XboxController xboxController2;
   
+  UsbCamera usbCamera0;
+  UsbCamera usbCamera1;
 
   //private Command m_autonomousCommand;
   private Command autonomousCommand;
-
-
 
   //private RobotContainer m_robotContainer;
 
@@ -88,6 +90,9 @@ public class Robot extends TimedRobot {
     armSubsystem = new ArmSubsystem();
     winchSubsystem = new WinchSubsystem();
     //hookSubsystem = new HookSubsystem();
+  
+    usbCamera0 = CameraServer.getInstance().startAutomaticCapture(0);
+    usbCamera1 = CameraServer.getInstance().startAutomaticCapture(1);
   }
 
   /**
@@ -178,7 +183,7 @@ public class Robot extends TimedRobot {
     }
 
         // Winch (2nd controller - left joy y)
-    winchSubsystem.setPower(xboxController2.getY(Hand.kLeft));
+    winchSubsystem.setPower(-xboxController2.getY(Hand.kLeft));
 
     //Arm (2nd controller - right joy y )
     armSubsystem.setPower(xboxController2.getY(Hand.kRight));
@@ -188,25 +193,34 @@ public class Robot extends TimedRobot {
     //TODO Check if this method of getting dpad input is correct or not. Controller should be a wired Xbox 360 controller. If using getPOV, which POV (int) is it?
 //    hookSubsystem.traversePower(Constants.HookTraversePower * ((xboxController.getRawButton(15) ? 1 : 0) - (xboxController.getRawButton(14) ? 1 : 0)));
 
-    // Intake/Hopper/Shooter
+    // SHOOT
     if (xboxController1.getTriggerAxis(Hand.kLeft) > 0.25) {
-        intakeHopperSubsystem.transportToShooter();
+        if(shooterSubsystem.atSetpoint())
+        {
+            intakeHopperSubsystem.transportToShooter();
+        }
+        else
+        {
+            intakeHopperSubsystem.stop();
+        }
         shooterSubsystem.enable();
     }
     else {
       shooterSubsystem.disable();
       shooterSubsystem.stop();
 
+      // INTAKE
       if (xboxController1.getBumper(Hand.kRight)) {
         intakeHopperSubsystem.intake();
       }
+      // EXPEL
       else if (xboxController1.getTriggerAxis(Hand.kRight) > 0.25) {
         intakeHopperSubsystem.expel();
       }
+      // STOP
       else {
         intakeHopperSubsystem.stop();
       }
-
     }
 
     // panel flipout and rotator

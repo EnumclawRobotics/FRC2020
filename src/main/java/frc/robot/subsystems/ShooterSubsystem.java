@@ -16,10 +16,11 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 
 
 public class ShooterSubsystem extends PIDSubsystem {
-    NetworkTableEntry outputEntry;
-    NetworkTableEntry setpointEntry;
     NetworkTableEntry feedforwardEntry;
     NetworkTableEntry getMeasurementEntry;
+    NetworkTableEntry outputEntry;
+    NetworkTableEntry percentEntry;
+    NetworkTableEntry setpointEntry;
 
     // private CANSparkMax motor1;
     private VictorSPX motor1;
@@ -28,7 +29,8 @@ public class ShooterSubsystem extends PIDSubsystem {
 
     // private CANEncoder encoder1;
     private Encoder encoder;
-    private SimpleMotorFeedforward shooterFeedforward;
+    // private SimpleMotorFeedforward shooterFeedforward;
+    private double previousPercent = 0;
 
     public ShooterSubsystem() {
         super(new PIDController(Constants.ShooterkP, Constants.ShooterkI, Constants.ShooterkD));
@@ -36,14 +38,16 @@ public class ShooterSubsystem extends PIDSubsystem {
         NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
         NetworkTable networkTable = networkTableInstance.getTable("ShooterSubsystem");
         
-        feedforwardEntry = networkTable.getEntry("FeedForward");
+        feedforwardEntry = networkTable.getEntry("FeedForward Constant");
         getMeasurementEntry = networkTable.getEntry("GetMeasurement");
-        outputEntry = networkTable.getEntry("Output");
+        outputEntry = networkTable.getEntry("Output PID");
+        percentEntry = networkTable.getEntry("Percent");
         setpointEntry = networkTable.getEntry("SetPoint");
 
         feedforwardEntry.setDouble(0);
         getMeasurementEntry.setDouble(0);
         outputEntry.setDouble(0);
+        percentEntry.setDouble(0);
         setpointEntry.setDouble(0);
 
         // // redline motors - brushed
@@ -56,28 +60,47 @@ public class ShooterSubsystem extends PIDSubsystem {
         // encoder1 = new CANEncoder(motor1, EncoderType.kQuadrature, Constants.ShooterEncoderCountsPerRevolution);
         encoder = new Encoder(Constants.ShooterEncoderADIO, Constants.ShooterEncoderBDIO, false, Encoder.EncodingType.k4X);
         encoder.setDistancePerPulse(1/8192);
-        shooterFeedforward = new SimpleMotorFeedforward(Constants.ShooterkSVolts, Constants.ShooterkWoltSecondsPerRotation);
+        // shooterFeedforward = new SimpleMotorFeedforward(Constants.ShooterkSVolts, Constants.ShooterkWoltSecondsPerRotation);
 
-        getController().setTolerance(Constants.ShooterTolerance);
+        getController().setTolerance(Constants.ShooterToleranceRPS);
+        getController().
         setSetpoint(Constants.ShooterFreeThrowRPS); //5000/60 
     }
 
     @Override
     public void useOutput(double output, double setpoint) {
-        double feedForward = shooterFeedforward.calculate(setpoint);
-        double current = output + feedForward;
-        double percent = output;
+        //double feedForward = shooterFeedforward.calculate(setpoint);
+        //double current = output + feedForward;
+        double percent = output + Constants.ShooterkFF;
 
-        motor1.set(ControlMode.PercentOutput, output);
-        motor2.set(ControlMode.PercentOutput, output);
+        // limit change by ramp
+        if (percent - this.previousPercent > Constants.ShooterRamp) {
+            percent = this.previousPercent + Constants.ShooterRamp;
+        } else if (this.previousPercent - percent > Constants.ShooterRamp) {
+            percent = this.previousPercent - Constants.ShooterRamp;
+        }
 
-        //motor1.setVoltage(output + shooterFeedforward.calculate(setpoint));
-        //motor2.setVoltage(output + shooterFeedforward.calculate(setpoint));
+        // limit by absolute
+        if (percent > Constants.ShooterkMaxOutput) {
+            percent = Constants.ShooterkMaxOutput;
+        } else if (percent > Constants.ShooterkMinOutput) {
+            percent = Constants.ShooterkMinOutput;
+        }
 
-        feedforwardEntry.setDouble(feedForward);
+        // set motors to run
+//        motor1.set(ControlMode.PercentOutput, percent);
+//        motor2.set(ControlMode.PercentOutput, percent);
+
+        //motor1.setVoltage(current);
+        //motor2.setVoltage(current);
+
+        //feedforwardEntry.setDouble(feedForward);
+        feedforwardEntry.setDouble(Constants.ShooterkFF);
         getMeasurementEntry.setDouble(getMeasurement());
         outputEntry.setDouble(output);
+        percentEntry.setDouble(percent);
         setpointEntry.setDouble(setpoint);
+
     }
 
     @Override
