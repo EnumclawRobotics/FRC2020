@@ -19,8 +19,9 @@ import com.revrobotics.ColorMatch;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public final static double ArcadeDriveRotateFactor = .5;
-    public final static double ArcadeDriveForwardFactor = 1;
+    public final static double ArcadeDriveRotateFeed = .3;
+    public final static double ArcadeDriveRotateSpan = .75;
+    public final static double ArcadeDriveForwardFeed = .25;
 
     public final static int DriveFrontLeftMotorCanId = 9;
     public final static int DriveBackLeftMotorCanId = 8;
@@ -85,6 +86,7 @@ public final class Constants {
     public final static double HookUnlockPosition = 0.0;
     public final static double HookTraversePower = 1.0;
 
-    public final static int WinchMotorCanId = 18; //Done
+    public final static int WinchMotorCanId = 18; 
+    public final static int WinchClampPwmId = 1; 
 
 }

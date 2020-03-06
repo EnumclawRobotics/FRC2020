@@ -4,6 +4,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -27,8 +28,7 @@ public class ShooterSubsystem extends PIDSubsystem {
     // private CANSparkMax motor2;
     private VictorSPX motor2;
 
-    // private CANEncoder encoder1;
-    private Encoder encoder;
+    private DutyCycleEncoder encoder;
     // private SimpleMotorFeedforward shooterFeedforward;
     private double previousPercent = 0;
 
@@ -58,13 +58,12 @@ public class ShooterSubsystem extends PIDSubsystem {
 
         // // through bore encoder
         // encoder1 = new CANEncoder(motor1, EncoderType.kQuadrature, Constants.ShooterEncoderCountsPerRevolution);
-        encoder = new Encoder(Constants.ShooterEncoderADIO, Constants.ShooterEncoderBDIO, false, Encoder.EncodingType.k4X);
-        encoder.setDistancePerPulse(1/8192);
+        encoder = new DutyCycleEncoder(3);
+//        encoder.setDistancePerPulse(1/8192);
         // shooterFeedforward = new SimpleMotorFeedforward(Constants.ShooterkSVolts, Constants.ShooterkWoltSecondsPerRotation);
 
         getController().setTolerance(Constants.ShooterToleranceRPS);
-        getController().
-        setSetpoint(Constants.ShooterFreeThrowRPS); //5000/60 
+        getController().setSetpoint(Constants.ShooterFreeThrowRPS); //5000/60 
     }
 
     @Override
@@ -80,16 +79,19 @@ public class ShooterSubsystem extends PIDSubsystem {
             percent = this.previousPercent - Constants.ShooterRamp;
         }
 
-        // limit by absolute
+        // limit by absolute bounds
         if (percent > Constants.ShooterkMaxOutput) {
             percent = Constants.ShooterkMaxOutput;
-        } else if (percent > Constants.ShooterkMinOutput) {
+        } else if (percent < Constants.ShooterkMinOutput) {
             percent = Constants.ShooterkMinOutput;
         }
 
+        // update previousPercent
+        this.previousPercent = percent;
+
         // set motors to run
-//        motor1.set(ControlMode.PercentOutput, percent);
-//        motor2.set(ControlMode.PercentOutput, percent);
+        motor1.set(ControlMode.PercentOutput, percent);
+        motor2.set(ControlMode.PercentOutput, percent);
 
         //motor1.setVoltage(current);
         //motor2.setVoltage(current);
@@ -100,12 +102,16 @@ public class ShooterSubsystem extends PIDSubsystem {
         outputEntry.setDouble(output);
         percentEntry.setDouble(percent);
         setpointEntry.setDouble(setpoint);
-
     }
 
     @Override
     public double getMeasurement() {
-        return encoder.getRate(); 
+        return 0;
+//        return encoder.getFrequency(); 
+    }
+
+    public double getDistance() {
+        return encoder.getDistance(); 
     }
 
     public boolean atSetpoint() {
@@ -117,5 +123,6 @@ public class ShooterSubsystem extends PIDSubsystem {
         this.disable();
         motor1.set(ControlMode.Current, 0);
         motor2.set(ControlMode.Current, 0);
+        this.previousPercent = 0;
     }
 }

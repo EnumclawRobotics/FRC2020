@@ -23,7 +23,7 @@ public class ShootingTimedCommand extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        shooterSubsystem.setSetpoint(shooterRPS);
+        shooterSubsystem.enable();
         timer.reset();
         timer.start();
     }
@@ -31,20 +31,24 @@ public class ShootingTimedCommand extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        if(shooterSubsystem.atSetpoint())
+        // if(shooterSubsystem.atSetpoint())
+        // {
+        //     intakeHopperSubsystem.transportToShooter();
+        // }
+        // else
+        // {
+        //     intakeHopperSubsystem.stop();
+        // }
+
+        if (timer.get() > 2.0)
         {
             intakeHopperSubsystem.transportToShooter();
-        }
-        else
-        {
-            intakeHopperSubsystem.stop();
         }
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
-        shooterSubsystem.setSetpoint(0);
         intakeHopperSubsystem.stop();
         shooterSubsystem.stop();
     }

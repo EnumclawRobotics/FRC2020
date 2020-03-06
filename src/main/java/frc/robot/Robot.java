@@ -7,8 +7,17 @@
 
 package frc.robot;
 
-import edu.wpi.cscore.UsbCamera;
+import org.opencv.core.Mat;
+import org.opencv.core.Point;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
+
+import edu.wpi.cscore.CvSink;
+import edu.wpi.cscore.CvSource;
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -64,11 +73,13 @@ public class Robot extends TimedRobot {
   private XboxController xboxController1;
   private XboxController xboxController2;
   
-  UsbCamera usbCamera0;
-  UsbCamera usbCamera1;
-
   //private Command m_autonomousCommand;
   private Command autonomousCommand;
+
+  private NetworkTableEntry shooterEntry;
+
+  private boolean driveReversed = false;
+
 
   //private RobotContainer m_robotContainer;
 
@@ -91,9 +102,44 @@ public class Robot extends TimedRobot {
     winchSubsystem = new WinchSubsystem();
     //hookSubsystem = new HookSubsystem();
   
-    usbCamera0 = CameraServer.getInstance().startAutomaticCapture(0);
-    usbCamera1 = CameraServer.getInstance().startAutomaticCapture(1);
+//    usbCamera0 = CameraServer.getInstance().startAutomaticCapture(0);
+//    usbCamera1 = CameraServer.getInstance().startAutomaticCapture(1);
+
+    startCaptureWithCenterLine(0);
+    startCaptureWithCenterLine(1);
+
+    NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
+    NetworkTable networkTable = networkTableInstance.getTable("ShooterSubsystem");
+    
+    shooterEntry = networkTable.getEntry("Test Entry");
   }
+
+  private void startCaptureWithCenterLine(int usbId) {
+    new Thread(() -> {
+      CameraServer.getInstance().startAutomaticCapture(usbId);
+      String cameraName = "USB Camera " + Integer.toString(usbId);
+      //camera.setResolution(640, 480);
+
+      CvSink cvSink = CameraServer.getInstance().getVideo(cameraName);
+      CvSource outputStream = CameraServer.getInstance().putVideo(cameraName, 640, 480);
+
+      Mat source = new Mat();
+      Mat output = new Mat();
+
+      while(!Thread.interrupted()) {
+        if (cvSink.grabFrame(source) == 0) {
+          continue;
+        }
+
+        Imgproc.line(source, new Point(source.width()/2, 0), 
+          new Point(source.width()/2, source.height()),  
+          new Scalar(0.361, 0.524, 0.113));
+        
+        outputStream.putFrame(source);
+      }
+    }).start();
+  }
+
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
@@ -136,7 +182,7 @@ public class Robot extends TimedRobot {
     //   m_autonomousCommand.schedule();
     // }
 
-    autonomousCommand = new SequentialCommandGroup(new ShootingTimedCommand(5, 1000, intakeHopperSubsystem, shooterSubsystem));
+    autonomousCommand = new SequentialCommandGroup(new ShootingTimedCommand(10, Constants.ShooterFreeThrowRPS, intakeHopperSubsystem, shooterSubsystem));
     if (autonomousCommand != null)
     {
       autonomousCommand.schedule();
@@ -171,11 +217,17 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
+    shooterEntry.setDouble(shooterSubsystem.getDistance());
 
     //Driving, Left Trigger reverses forward/backward
-    if (xboxController1.getTriggerAxis(Hand.kLeft) > 0.50)
+    if (xboxController1.getBumperPressed(Hand.kLeft))
     {
-      driveSubsystem.arcadeDrive(-xboxController1.getY(Hand.kLeft), xboxController1.getX(Hand.kRight));  
+      driveReversed = !driveReversed;
+    }
+
+    if (driveReversed)
+    {
+      driveSubsystem.arcadeDrive(-xboxController1.getY(Hand.kLeft), -xboxController1.getX(Hand.kRight));
     }
     else
     {
@@ -235,19 +287,14 @@ public class Robot extends TimedRobot {
     -* Hook Travel (Reversable) - (hat) dpad left and right
     - control panel flipout - select
     - control panel rotate - start 
-
-
     */
-
-
-
-
   }
 
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
+
   }
 
   /**
@@ -255,5 +302,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
+    shooterEntry.setDouble(shooterSubsystem.getDistance());
   }
 }

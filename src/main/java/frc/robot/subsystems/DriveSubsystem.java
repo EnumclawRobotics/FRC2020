@@ -44,10 +44,16 @@ public class DriveSubsystem extends SubsystemBase {
    * @param forward 
    * @param rotation
    */
-  public void arcadeDrive(double forward, double rotation) {
+  public void arcadeDrive(double forward, double rotate) {
     // TODO: Add Ramping to drive? Or Feedforward to drive?
 
-    drive.arcadeDrive(forward * Constants.ArcadeDriveForwardFactor, rotation * Constants.ArcadeDriveRotateFactor);
+    double rotatePower = Math.signum(rotate) * rotate * rotate;
+    double forwardPower = Math.signum(forward) * forward * forward;
+
+    rotatePower = (Math.signum(rotatePower) * Constants.ArcadeDriveRotateFeed) + (rotatePower * (1- Constants.ArcadeDriveRotateFeed) * Constants.ArcadeDriveRotateSpan);
+    forwardPower = (Math.signum(forward) * Constants.ArcadeDriveForwardFeed) + (forward * (1- Constants.ArcadeDriveForwardFeed));
+
+    drive.arcadeDrive(forwardPower, rotatePower);
   }
 
   // public double getEncoderDistance()

@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -15,9 +16,13 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class WinchSubsystem extends SubsystemBase {
   private CANSparkMax winchMotor;
+  private Servo clampServo;
 
   public WinchSubsystem() {
     winchMotor = new CANSparkMax(Constants.WinchMotorCanId, MotorType.kBrushless);
+    clampServo = new Servo(Constants.WinchClampPwmId);
+    clampServo.setBounds(2.0, 1.8, 1.5, 1.2, 1.0);
+    clampServo.setSpeed(1.0); // to open
   }
 
   public void setPower(double power)
@@ -28,5 +33,13 @@ public class WinchSubsystem extends SubsystemBase {
   public void stop()
   {
     winchMotor.stopMotor();
+  }
+
+  public void clamp() {
+    clampServo.setSpeed(-1.0); // to close
+  }
+
+  public void unclamp() {
+    clampServo.setSpeed(1.0); // to open
   }
 }
