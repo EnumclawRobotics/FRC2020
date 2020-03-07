@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.IntakeHopperSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj.Timer;
@@ -23,7 +24,9 @@ public class ShootingTimedCommand extends CommandBase {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        shooterSubsystem.setTargetPower(Constants.ShooterkFF);
         shooterSubsystem.enable();
+        intakeHopperSubsystem.chargeIntakeForShooter();
         timer.reset();
         timer.start();
     }
@@ -40,7 +43,7 @@ public class ShootingTimedCommand extends CommandBase {
         //     intakeHopperSubsystem.stop();
         // }
 
-        if (timer.get() > 2.0)
+        if (timer.get() > 3.5)
         {
             intakeHopperSubsystem.transportToShooter();
         }

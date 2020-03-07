@@ -42,6 +42,11 @@ public class IntakeHopperSubsystem extends SubsystemBase {
         hopperMotor.set(ControlMode.PercentOutput, Constants.HopperShootingPower);
     }
 
+    public void chargeIntakeForShooter()
+    {
+        intakeMotor.set(ControlMode.PercentOutput, Constants.IntakeShootingPower);
+    }
+
     public void stop() {
         //intakeMotor.stopMotor();
         intakeMotor.set(ControlMode.PercentOutput, 0);

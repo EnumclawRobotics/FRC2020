@@ -32,6 +32,8 @@ public class ShooterSubsystem extends PIDSubsystem {
     // private SimpleMotorFeedforward shooterFeedforward;
     private double previousPercent = 0;
 
+    private double targetShootingPower = 0;
+
     public ShooterSubsystem() {
         super(new PIDController(Constants.ShooterkP, Constants.ShooterkI, Constants.ShooterkD));
         
@@ -66,11 +68,17 @@ public class ShooterSubsystem extends PIDSubsystem {
         getController().setSetpoint(Constants.ShooterFreeThrowRPS); //5000/60 
     }
 
+    public void setTargetPower(double power)
+    {
+        targetShootingPower = power;
+    }
+
     @Override
     public void useOutput(double output, double setpoint) {
         //double feedForward = shooterFeedforward.calculate(setpoint);
         //double current = output + feedForward;
-        double percent = output + Constants.ShooterkFF;
+        //double percent = output + Constants.ShooterkFF;
+        double percent = targetShootingPower;
 
         // limit change by ramp
         if (percent - this.previousPercent > Constants.ShooterRamp) {

@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
@@ -19,6 +20,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -78,7 +80,14 @@ public class Robot extends TimedRobot {
 
   private NetworkTableEntry shooterEntry;
 
-  private boolean driveReversed = false;
+  private static boolean driveNormal = true;
+
+  private final Timer shooterTimer = new Timer();
+  private boolean shooterActivated = false;
+
+  private static boolean slowedDown = false;
+  private final double slowDownForward = 0.4;
+  private final double slowDownTurning = 0.6;
 
 
   //private RobotContainer m_robotContainer;
@@ -105,8 +114,8 @@ public class Robot extends TimedRobot {
 //    usbCamera0 = CameraServer.getInstance().startAutomaticCapture(0);
 //    usbCamera1 = CameraServer.getInstance().startAutomaticCapture(1);
 
-    startCaptureWithCenterLine(0);
-    startCaptureWithCenterLine(1);
+    startCaptureWithCenterLine(0, "Intake Camera");
+    startCaptureWithCenterLine(1, "Shooter Camera");
 
     NetworkTableInstance networkTableInstance = NetworkTableInstance.getDefault();
     NetworkTable networkTable = networkTableInstance.getTable("ShooterSubsystem");
@@ -114,11 +123,18 @@ public class Robot extends TimedRobot {
     shooterEntry = networkTable.getEntry("Test Entry");
   }
 
-  private void startCaptureWithCenterLine(int usbId) {
+  public static boolean isDriveNormal() {
+    return driveNormal;
+  }
+
+  public static boolean isSlowedDown() {
+    return slowedDown;
+  }
+
+  private void startCaptureWithCenterLine(int usbId, String cameraName) {
     new Thread(() -> {
-      CameraServer.getInstance().startAutomaticCapture(usbId);
-      String cameraName = "USB Camera " + Integer.toString(usbId);
-      //camera.setResolution(640, 480);
+      CameraServer.getInstance().startAutomaticCapture(cameraName, usbId);
+     //camera.setResolution(640, 480);
 
       CvSink cvSink = CameraServer.getInstance().getVideo(cameraName);
       CvSource outputStream = CameraServer.getInstance().putVideo(cameraName, 640, 480);
@@ -126,20 +142,37 @@ public class Robot extends TimedRobot {
       Mat source = new Mat();
       Mat output = new Mat();
 
+      Scalar greenColor = new Scalar(0,255,0); 
+
       while(!Thread.interrupted()) {
         if (cvSink.grabFrame(source) == 0) {
           continue;
         }
 
+        // draw center line
+        // TODO: Make thicker?
         Imgproc.line(source, new Point(source.width()/2, 0), 
-          new Point(source.width()/2, source.height()),  
-          new Scalar(0.361, 0.524, 0.113));
-        
+          new Point(source.width()/2, source.height()), greenColor);
+
+        // intake should be 0, is that front?
+        if ((Robot.isDriveNormal() && usbId == 0) 
+            || (!Robot.isDriveNormal() && usbId == 1)) {
+
+          // build text
+          String showText = "FRONT";
+
+          if (Robot.isSlowedDown()) {
+            showText += " - SLOWED";
+          }
+
+          Imgproc.putText(source, showText, new Point(source.width()/2, 30), 0, 1, greenColor);
+        }
+
         outputStream.putFrame(source);
       }
+
     }).start();
   }
-
 
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
@@ -219,20 +252,30 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     shooterEntry.setDouble(shooterSubsystem.getDistance());
 
+    //Slow Down Driving? (Toggle with X button)
+    if (xboxController1.getXButtonPressed())
+    {
+      slowedDown = !slowedDown;
+    }
+
     //Driving, Left Trigger reverses forward/backward
     if (xboxController1.getBumperPressed(Hand.kLeft))
     {
-      driveReversed = !driveReversed;
+      driveNormal = !driveNormal;
     }
 
-    if (driveReversed)
+    double forwardSpeed = xboxController1.getY(Hand.kLeft);
+    double turningSpeed = -xboxController1.getX(Hand.kRight);
+    if (!driveNormal)
     {
-      driveSubsystem.arcadeDrive(-xboxController1.getY(Hand.kLeft), -xboxController1.getX(Hand.kRight));
+      forwardSpeed *= -1;
     }
-    else
+    if (slowedDown)
     {
-      driveSubsystem.arcadeDrive(xboxController1.getY(Hand.kLeft), -xboxController1.getX(Hand.kRight));
+      forwardSpeed *= slowDownForward;
+      turningSpeed *= slowDownTurning;
     }
+    driveSubsystem.arcadeDrive(forwardSpeed, turningSpeed);
 
         // Winch (2nd controller - left joy y)
     winchSubsystem.setPower(-xboxController2.getY(Hand.kLeft));
@@ -247,31 +290,42 @@ public class Robot extends TimedRobot {
 
     // SHOOT
     if (xboxController1.getTriggerAxis(Hand.kLeft) > 0.25) {
-        if(shooterSubsystem.atSetpoint())
-        {
-            intakeHopperSubsystem.transportToShooter();
-        }
-        else
-        {
-            intakeHopperSubsystem.stop();
-        }
-        shooterSubsystem.enable();
+      if (!shooterActivated)
+      {
+        shooterTimer.reset();
+        shooterTimer.start();
+      }
+      shooterSubsystem.setTargetPower(Constants.ShooterkFF);
+      shooterActivated = true;
+      shooterSubsystem.enable();
+      intakeHopperSubsystem.chargeIntakeForShooter();
+
+      if (shooterTimer.get() > 2.5)
+      {
+        intakeHopperSubsystem.transportToShooter();
+      }
+      
     }
     else {
-      shooterSubsystem.disable();
-      shooterSubsystem.stop();
+      shooterActivated = false;
 
       // INTAKE
       if (xboxController1.getBumper(Hand.kRight)) {
         intakeHopperSubsystem.intake();
+        shooterSubsystem.setTargetPower(Constants.ShooterkFFIntake);
+        shooterSubsystem.enable();
       }
       // EXPEL
       else if (xboxController1.getTriggerAxis(Hand.kRight) > 0.25) {
         intakeHopperSubsystem.expel();
+        shooterSubsystem.disable();
+        shooterSubsystem.stop();
       }
       // STOP
       else {
         intakeHopperSubsystem.stop();
+        shooterSubsystem.disable();
+        shooterSubsystem.stop();
       }
     }
 
