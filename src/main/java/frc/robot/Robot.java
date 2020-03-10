@@ -86,9 +86,6 @@ public class Robot extends TimedRobot {
   private boolean shooterActivated = false;
 
   private static boolean slowedDown = false;
-  private final double slowDownForward = 0.4;
-  private final double slowDownTurning = 0.6;
-
 
   //private RobotContainer m_robotContainer;
 
@@ -142,7 +139,9 @@ public class Robot extends TimedRobot {
       Mat source = new Mat();
       Mat output = new Mat();
 
-      Scalar greenColor = new Scalar(0,255,0); 
+      Scalar blackColor = new Scalar(0,0,0);
+      Scalar greenColor = new Scalar(0,255,0);
+      Scalar yellowColor = new Scalar(0,255,255);   // BGR 
 
       while(!Thread.interrupted()) {
         if (cvSink.grabFrame(source) == 0) {
@@ -150,9 +149,8 @@ public class Robot extends TimedRobot {
         }
 
         // draw center line
-        // TODO: Make thicker?
         Imgproc.line(source, new Point(source.width()/2, 0), 
-          new Point(source.width()/2, source.height()), greenColor);
+          new Point(source.width()/2, source.height()), yellowColor, 2);
 
         // intake should be 0, is that front?
         if ((Robot.isDriveNormal() && usbId == 0) 
@@ -160,12 +158,14 @@ public class Robot extends TimedRobot {
 
           // build text
           String showText = "FRONT";
+          Imgproc.putText(source, showText, new Point(source.width()*.15, 30), 0, .75, blackColor, 3);
+          Imgproc.putText(source, showText, new Point(source.width()*.15, 30), 0, .75, yellowColor, 2);
 
           if (Robot.isSlowedDown()) {
-            showText += " - SLOWED";
+            showText = "SLOWED";
+            Imgproc.putText(source, showText, new Point(source.width()*.55, 30), 0, .75, blackColor, 3);
+            Imgproc.putText(source, showText, new Point(source.width()*.55, 30), 0, .75, yellowColor, 2);
           }
-
-          Imgproc.putText(source, showText, new Point(source.width()/2, 30), 0, 1, greenColor);
         }
 
         outputStream.putFrame(source);
@@ -258,7 +258,7 @@ public class Robot extends TimedRobot {
       slowedDown = !slowedDown;
     }
 
-    //Driving, Left Trigger reverses forward/backward
+    //Driving, Left Bumper reverses forward/backward
     if (xboxController1.getBumperPressed(Hand.kLeft))
     {
       driveNormal = !driveNormal;
@@ -272,8 +272,8 @@ public class Robot extends TimedRobot {
     }
     if (slowedDown)
     {
-      forwardSpeed *= slowDownForward;
-      turningSpeed *= slowDownTurning;
+      forwardSpeed *= Constants.DriveSlowDownForward;
+      turningSpeed *= Constants.DriveSlowDownTurning;
     }
     driveSubsystem.arcadeDrive(forwardSpeed, turningSpeed);
 
@@ -294,17 +294,17 @@ public class Robot extends TimedRobot {
       {
         shooterTimer.reset();
         shooterTimer.start();
+
+        shooterSubsystem.setTargetPower(Constants.ShooterkFF);
+        shooterActivated = true;
+        shooterSubsystem.enable();
+        intakeHopperSubsystem.chargeIntakeForShooter();
       }
-      shooterSubsystem.setTargetPower(Constants.ShooterkFF);
-      shooterActivated = true;
-      shooterSubsystem.enable();
-      intakeHopperSubsystem.chargeIntakeForShooter();
 
       if (shooterTimer.get() > 2.5)
       {
         intakeHopperSubsystem.transportToShooter();
       }
-      
     }
     else {
       shooterActivated = false;

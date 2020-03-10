@@ -76,8 +76,7 @@ public class ShooterSubsystem extends PIDSubsystem {
     @Override
     public void useOutput(double output, double setpoint) {
         //double feedForward = shooterFeedforward.calculate(setpoint);
-        //double current = output + feedForward;
-        //double percent = output + Constants.ShooterkFF;
+        //double percent = Constants.ShooterkFF;
         double percent = targetShootingPower;
 
         // limit change by ramp
@@ -101,6 +100,15 @@ public class ShooterSubsystem extends PIDSubsystem {
         motor1.set(ControlMode.PercentOutput, percent);
         motor2.set(ControlMode.PercentOutput, percent);
 
+
+
+        // limit change by ramp
+        // limit by absolute bounds
+        
+        // set motors to run
+        // motor1.set(ControlMode.Current, current);
+        // motor2.set(ControlMode.Current, current);
+        
         //motor1.setVoltage(current);
         //motor2.setVoltage(current);
 
@@ -129,8 +137,8 @@ public class ShooterSubsystem extends PIDSubsystem {
     public void stop()
     {
         this.disable();
-        motor1.set(ControlMode.Current, 0);
-        motor2.set(ControlMode.Current, 0);
+        motor1.set(ControlMode.PercentOutput, 0);
+        motor2.set(ControlMode.PercentOutput, 0);
         this.previousPercent = 0;
     }
 }

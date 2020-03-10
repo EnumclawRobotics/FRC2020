@@ -29,15 +29,18 @@ public final class Constants {
     public final static int DriveBackRightMotorCanId = 6;
 //    public final static boolean GyroReversed = false;
 
+    public final static double DriveSlowDownForward = 0.4;
+    public final static double DriveSlowDownTurning = 0.8;
+
     public final static int IntakeMotorCanId = 10;      //VictorSPX - redline
     public final static double IntakeIntakingPower = .6;
     public final static double IntakeExpellingPower = -.6;
     public final static double IntakeShootingPower = .8;
 
     public final static int HopperMotorCanId = 11;        //VictorSPX - redline
-    public final static double HopperIntakingPower = .3;
-    public final static double HopperExpellingPower = -.3;
-    public final static double HopperShootingPower = -.3;
+    public final static double HopperIntakingPower = .21;
+    public final static double HopperExpellingPower = -.4;
+    public final static double HopperShootingPower = -.4;
 
     public final static int ShooterMotor1CanId = 12;    // VictorSPX - redline
     public final static int ShooterMotor2CanId = 13;    // VictorSPX - redline
@@ -59,14 +62,14 @@ public final class Constants {
     public final static double ShooterkMinOutput = -1;
 
     public final static int ShooterEncoderCountsPerRevolution = 8192;
-    public final static double ShooterFreeThrowRPS = 5000/60;
     public final static double ShooterToleranceRPS = 1;
-    public final static double ShootermaxRPS = 5700/60;
+    public final static double ShooterMaxRPM = (21020 * (1/3.25) * 2);
+    public final static double ShootermaxRPS = ShooterMaxRPM/60;
+    public final static double ShooterFreeThrowRPS = .75 * ShootermaxRPS;
 
-    public final static double ShooterkSVolts = 000;
-    public final static double ShooterkWoltSecondsPerRotation = 000;
+    public final static double ShooterkSVolts = 12 * ShooterFreeThrowRPS / ShootermaxRPS;
+//    public final static double ShooterkWoltSecondsPerRotation = 000;
     
-
     public final static int PanelMotorCanId = 14; //Rotator, 14 Neo Brushless Brake
     public final static int FlipOutMotorCanId = 15; //(done) todo Physically put a Victor SPX based motor controller here
     public final static double MaxPanelMotorPower = 0.60;
