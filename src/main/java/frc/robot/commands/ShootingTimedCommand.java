@@ -11,20 +11,18 @@ public class ShootingTimedCommand extends CommandBase {
     private ShooterSubsystem shooterSubsystem;
     private final Timer timer = new Timer();
     private double duration;
-    private double shooterRPS;
 
     public ShootingTimedCommand(double duration, double shooterRPS, IntakeHopperSubsystem intakeHopperSubsystem, ShooterSubsystem shooterSubsystem) {
         this.intakeHopperSubsystem = intakeHopperSubsystem;
         this.shooterSubsystem = shooterSubsystem;
         this.duration = duration;
-        this.shooterRPS = shooterRPS;
         addRequirements(intakeHopperSubsystem, shooterSubsystem);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        shooterSubsystem.setTargetPower(Constants.ShooterkFF);
+        shooterSubsystem.shoot();
         shooterSubsystem.enable();
         intakeHopperSubsystem.chargeIntakeForShooter();
         timer.reset();

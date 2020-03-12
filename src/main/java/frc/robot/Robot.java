@@ -188,7 +188,7 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-
+    shooterSubsystem.updateFrequency();
   }
 
   /**
@@ -250,7 +250,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void teleopPeriodic() {
-    shooterEntry.setDouble(shooterSubsystem.getDistance());
+    shooterEntry.setDouble(shooterSubsystem.getFrequency());
 
     //Slow Down Driving? (Toggle with X button)
     if (xboxController1.getXButtonPressed())
@@ -294,10 +294,11 @@ public class Robot extends TimedRobot {
       {
         shooterTimer.reset();
         shooterTimer.start();
-
-        shooterSubsystem.setTargetPower(Constants.ShooterkFF);
         shooterActivated = true;
+
+        shooterSubsystem.shoot();
         shooterSubsystem.enable();
+
         intakeHopperSubsystem.chargeIntakeForShooter();
       }
 
@@ -311,44 +312,33 @@ public class Robot extends TimedRobot {
 
       // INTAKE
       if (xboxController1.getBumper(Hand.kRight)) {
-        intakeHopperSubsystem.intake();
-        shooterSubsystem.setTargetPower(Constants.ShooterkFFIntake);
+        shooterSubsystem.intake();
         shooterSubsystem.enable();
+        intakeHopperSubsystem.intake();
       }
       // EXPEL
       else if (xboxController1.getTriggerAxis(Hand.kRight) > 0.25) {
-        intakeHopperSubsystem.expel();
         shooterSubsystem.disable();
         shooterSubsystem.stop();
+        intakeHopperSubsystem.expel();
       }
       // STOP
       else {
-        intakeHopperSubsystem.stop();
+        // TODO: in shooter subsytem dont all disable if already disabled
         shooterSubsystem.disable();
         shooterSubsystem.stop();
+        intakeHopperSubsystem.stop();
       }
     }
 
     // panel flipout and rotator
     // [Put code here]
-
-    /*Additional List *Done (May exclude speed variables)
-    -* Switch Front/Back - left bumper > 50%
-    -* Intake (Reversable) - right bumper / right trigger 
-    -* Shooting - left trigger > 25%
-    -* Raise Arm (Reversable) - X & Y
-    -* Winching (Reversable) - A & B
-    -* Hook Travel (Reversable) - (hat) dpad left and right
-    - control panel flipout - select
-    - control panel rotate - start 
-    */
   }
 
   @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
-
   }
 
   /**
@@ -356,6 +346,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void testPeriodic() {
-    shooterEntry.setDouble(shooterSubsystem.getDistance());
+    shooterEntry.setDouble(shooterSubsystem.getFrequency());
   }
 }
