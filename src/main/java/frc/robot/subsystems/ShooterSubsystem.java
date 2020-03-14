@@ -66,7 +66,7 @@ public class ShooterSubsystem extends PIDSubsystem {
 
         // through bore encoder
         encoder = new DutyCycleEncoder(3);    // using absolute white wire 1rev per pulse
-    
+
         getController().setTolerance(Constants.ShooterToleranceRPS);
         getController().setSetpoint(0);
 
@@ -147,11 +147,11 @@ public class ShooterSubsystem extends PIDSubsystem {
     }
 
     public double getDistance() {
-        return encoder.getDistance(); 
+        return -encoder.getDistance(); 
     }
 
     public boolean atSetpoint() {
-        return getController().atSetpoint();
+        return Math.abs(getMeasurement() - getController().getSetpoint()) <= Constants.ShooterToleranceRPS; 
     }
 
     public void stop()

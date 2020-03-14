@@ -41,7 +41,7 @@ public class ShootingTimedCommand extends CommandBase {
         //     intakeHopperSubsystem.stop();
         // }
 
-        if (timer.get() > 3.5)
+        if (shooterSubsystem.atSetpoint())
         {
             intakeHopperSubsystem.transportToShooter();
         }

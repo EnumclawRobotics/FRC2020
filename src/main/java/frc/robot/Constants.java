@@ -48,20 +48,19 @@ public final class Constants {
     public final static int ShooterEncoderBDIO = 2;     // Yellow cable
 
     // PID coefficients
-    public final static double ShooterkP = .005; 
-    public final static double ShooterkI = 0; // 1e-6;
+    public final static double ShooterkP = .01; 
+    public final static double ShooterkI = .00075; // 1e-6;
     public final static double ShooterkD = 0; 
 
-    public final static double ShooterkFF = .51;            // % power  .62 with old battery
+    public final static double ShooterkFF = .57;            // % power  .62 with old battery
     public final static double ShooterkFFIntake = -.15;
 
-    public final static double ShooterRamp = .20;           // only ramp 2.5% power per cycle 
+    public final static double ShooterRamp = .10;           // ramp power per cycle 
     public final static double ShooterkMaxOutput = 1; 
     public final static double ShooterkMinOutput = -1;
-
-    public final static double ShooterToleranceRPS = 1;
-    public final static double ShooterFreeThrowRPS = 35;
-    public final static double ShooterIntakeRPS = -5;
+    public final static double ShooterToleranceRPS = 5;
+    public final static double ShooterFreeThrowRPS = 70;
+    public final static double ShooterIntakeRPS = -10;
 
 //    public final static double ShooterkSVolts = 12 * ShooterFreeThrowRPS / ShootermaxRPS;
 //    public final static double ShooterkWoltSecondsPerRotation = 000;

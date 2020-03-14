@@ -82,7 +82,7 @@ public class Robot extends TimedRobot {
 
   private static boolean driveNormal = true;
 
-  private final Timer shooterTimer = new Timer();
+  //private final Timer shooterTimer = new Timer();
   private boolean shooterActivated = false;
 
   private static boolean slowedDown = false;
@@ -292,8 +292,8 @@ public class Robot extends TimedRobot {
     if (xboxController1.getTriggerAxis(Hand.kLeft) > 0.25) {
       if (!shooterActivated)
       {
-        shooterTimer.reset();
-        shooterTimer.start();
+        //shooterTimer.reset();
+        //shooterTimer.start();
         shooterActivated = true;
 
         shooterSubsystem.shoot();
@@ -302,7 +302,7 @@ public class Robot extends TimedRobot {
         intakeHopperSubsystem.chargeIntakeForShooter();
       }
 
-      if (shooterTimer.get() > 2.5)
+      if (shooterSubsystem.atSetpoint())
       {
         intakeHopperSubsystem.transportToShooter();
       }
